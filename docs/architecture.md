@@ -186,7 +186,7 @@ When the live Claude usage request fails (429, 5xx, offline, timeout) — **not*
 | `five_hour_reset` / `seven_day_reset` | Unix epoch, or `null` |
 | `updated_at` | Unix epoch when statusline last wrote |
 
-Accepted only if `updated_at` is within **6 hours** and at least one window is non-null. Display converts used → remaining. UI sets `dataSource = .localCache` and shows *“From Claude Code cache”*.
+Accepted only if `updated_at` is within **6 hours** and at least one window is non-null. Display converts used → remaining. UI sets `dataSource = .localCache` and shows *“From Claude Code cache”*. Partial cache snapshots **merge** with the previous in-memory windows so a statusline tick that omits `five_hour` does not wipe a known 5hr value. The cache writer also merges on disk (never overwrites a window with null).
 
 This file is written by Claude Code’s **statusline** (stdin `rate_limits`), not by scanning JSONL logs.
 
@@ -204,7 +204,7 @@ Installs `~/.claude/limitmeter-write-usage-cache.sh` and prefixes `statusLine.co
 |----------|------|
 | `GET https://chatgpt.com/backend-api/wham/usage` | `Authorization: Bearer …`, optional `ChatGPT-Account-Id` |
 
-Payload: `rate_limit.primary_window` → 5hr, `secondary_window` → 7D (`used_percent`, reset fields). Some plans omit 7D → UI shows `—`.
+Payload: rate-limit windows classified by `limit_window_seconds` (≤12h → 5hr, longer → 7D), not by `primary`/`secondary` field names. Some plans (e.g. Prolite) only expose weekly in `primary_window` → 5hr shows `—`.
 
 These are the same **unofficial** surfaces the official apps use; they can change without notice.
 

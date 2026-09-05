@@ -59,6 +59,31 @@ final class UsageStoreErrorMergeTests: XCTestCase {
         XCTAssertEqual(merged.planLabel, "Pro")
     }
 
+    func testPreservingLastKnownMergesPartialLocalCache() {
+        let previous = ProviderUsage(
+            provider: .claude,
+            planLabel: "Pro",
+            fiveHour: LimitWindow(remainingPercent: 68, resetsAt: Date().addingTimeInterval(3600)),
+            sevenDay: LimitWindow(remainingPercent: 90, resetsAt: Date().addingTimeInterval(86400)),
+            status: .ok,
+            isSignedIn: true,
+            dataSource: .live
+        )
+        let next = ProviderUsage(
+            provider: .claude,
+            fiveHour: nil,
+            sevenDay: LimitWindow(remainingPercent: 95, resetsAt: Date().addingTimeInterval(21 * 3600)),
+            status: .ok,
+            isSignedIn: true,
+            dataSource: .localCache
+        )
+        let merged = UsageStore.preservingLastKnown(previous: previous, next: next)
+        XCTAssertEqual(merged.dataSource, .localCache)
+        XCTAssertEqual(merged.fiveHour?.remainingPercent, 68)
+        XCTAssertEqual(merged.sevenDay?.remainingPercent, 95)
+        XCTAssertEqual(merged.planLabel, "Pro")
+    }
+
     func testPreservingLastKnownDoesNotOverrideOk() {
         let previous = ProviderUsage(
             provider: .claude,

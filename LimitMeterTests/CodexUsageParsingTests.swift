@@ -12,6 +12,37 @@ final class CodexUsageParsingTests: XCTestCase {
         XCTAssertEqual(usage.fiveHour?.resetsAt.timeIntervalSince1970, 1_788_615_000)
     }
 
+    func testWeeklyOnlyPrimaryMapsToSevenDay() throws {
+        let data = try fixture("codex_usage_weekly_only")
+        let usage = try CodexUsageClient.parse(
+            data: data,
+            fetchedAt: Date(timeIntervalSince1970: 1_788_654_420)
+        )
+        XCTAssertNil(usage.fiveHour)
+        XCTAssertEqual(usage.sevenDay?.remainingPercent ?? -1, 95, accuracy: 0.01)
+        XCTAssertEqual(usage.sevenDay?.resetsAt.timeIntervalSince1970, 1_789_133_220)
+        XCTAssertEqual(usage.planLabel, "Prolite")
+    }
+
+    func testClassifyUsesLimitWindowSecondsNotFieldName() {
+        let weekly = CodexWindowPayload(
+            used_percent: 5,
+            limit_window_seconds: 604_800,
+            reset_at: 1_789_133_220,
+            reset_after_seconds: 478_800
+        )
+        let five = CodexWindowPayload(
+            used_percent: 40,
+            limit_window_seconds: 18000,
+            reset_at: 1_788_615_000,
+            reset_after_seconds: 3720
+        )
+        // Swap field order vs usual naming: weekly in primary, 5hr in secondary.
+        let classified = CodexUsageClient.classifyWindows(primary: weekly, secondary: five)
+        XCTAssertEqual(classified.fiveHour?.used_percent, 40)
+        XCTAssertEqual(classified.sevenDay?.used_percent, 5)
+    }
+
     private func fixture(_ name: String) throws -> Data {
         #if SWIFT_PACKAGE
             let url = Bundle.module.url(forResource: name, withExtension: "json", subdirectory: "Fixtures")

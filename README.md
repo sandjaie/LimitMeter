@@ -119,5 +119,5 @@ If `xcodebuild` fails on your machine (some Xcode 26 / simulator plugin issues),
 ## Notes
 
 - Usage comes from the same unofficial endpoints the official apps use; they can change.
-- Codex may only expose a 5-hour window on some plans — 7D shows `—` when unavailable.
+- Codex may only expose a weekly window on some plans — 5hr shows `—` when unavailable.
 - For personal local use with your own subscription login.

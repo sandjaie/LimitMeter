@@ -156,9 +156,22 @@ public final class UsageStore {
         return false
     }
 
-    /// Keep last known % / plan when a refresh fails or needs re-auth, so the UI doesn't go blank.
+    /// Keep last known % / plan when a refresh fails, needs re-auth, or returns a
+    /// partial Claude Code cache snapshot (statusline often omits one window).
     static func preservingLastKnown(previous: ProviderUsage, next: ProviderUsage) -> ProviderUsage {
         switch next.status {
+        case .ok where next.dataSource == .localCache:
+            var merged = next
+            if merged.fiveHour == nil {
+                merged.fiveHour = previous.fiveHour
+            }
+            if merged.sevenDay == nil {
+                merged.sevenDay = previous.sevenDay
+            }
+            if merged.planLabel == nil {
+                merged.planLabel = previous.planLabel
+            }
+            return merged
         case .ok:
             return next
         case .needsAuth, .error:
