@@ -1,0 +1,40 @@
+excluded:
+  - .build
+  - DerivedData
+  - .superpowers
+  - scripts
+
+disabled_rules:
+  - todo
+  - trailing_whitespace
+
+opt_in_rules:
+  - empty_count
+  - first_where
+  - sorted_first_last
+
+# Match SwiftFormat --trailingcommas
+trailing_comma:
+  mandatory_comma: true
+
+line_length:
+  warning: 120
+  error: 200
+  ignores_function_declarations: true
+  ignores_comments: true
+  ignores_urls: true
+
+identifier_name:
+  min_length:
+    warning: 2
+  allowed_symbols: "_"
+  excluded:
+    - id
+    - x
+    - y
+    - ok
+
+type_name:
+  min_length: 3
+
+reporter: xcode

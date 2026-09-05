@@ -1,0 +1,67 @@
+name: LimitMeter
+options:
+  bundleIdPrefix: dev.limitmeter
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+  xcodeVersion: "15.0"
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+targets:
+  LimitMeterCore:
+    type: framework
+    platform: macOS
+    sources:
+      - path: LimitMeter
+        excludes:
+          - Info.plist
+          - "*.entitlements"
+          - Assets.xcassets
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.limitmeter.core
+        PRODUCT_NAME: LimitMeterCore
+        GENERATE_INFOPLIST_FILE: true
+        CODE_SIGN_IDENTITY: "-"
+        ENABLE_TESTABILITY: true
+  LimitMeter:
+    type: application
+    platform: macOS
+    sources:
+      - path: LimitMeterApp
+      - path: LimitMeter/Assets.xcassets
+    dependencies:
+      - target: LimitMeterCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.limitmeter.app
+        PRODUCT_NAME: LimitMeter
+        INFOPLIST_FILE: LimitMeter/Info.plist
+        GENERATE_INFOPLIST_FILE: false
+        CODE_SIGN_ENTITLEMENTS: LimitMeter/LimitMeter.entitlements
+        CODE_SIGN_IDENTITY: "-"
+        ENABLE_HARDENED_RUNTIME: true
+        COMBINE_HIDPI_IMAGES: true
+        CURRENT_PROJECT_VERSION: 1
+        MARKETING_VERSION: 0.1.0
+    scheme:
+      testTargets:
+        - LimitMeterCoreTests
+  LimitMeterCoreTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: LimitMeterTests
+        excludes:
+          - Fixtures
+    resources:
+      - path: LimitMeterTests/Fixtures
+    dependencies:
+      - target: LimitMeterCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.limitmeter.tests
+        GENERATE_INFOPLIST_FILE: true
+        CODE_SIGN_IDENTITY: "-"

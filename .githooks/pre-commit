@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Required local gate — do not bypass with --no-verify.
+set -euo pipefail
+ROOT="$(git rev-parse --show-toplevel)"
+exec "$ROOT/scripts/check.sh"

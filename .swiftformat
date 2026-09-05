@@ -1,0 +1,7 @@
+--swiftversion 5.9
+--indent 4
+--maxwidth 120
+--exclude .build,DerivedData,.superpowers
+--trimwhitespace always
+--stripunusedargs closure-only
+--disable wrapMultilineStatementBraces
